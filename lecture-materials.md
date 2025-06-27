@@ -42,7 +42,7 @@ web-app-mvp/
 │   │   ├── api/v1/
 │   │   │   └── posts.py    # ⭐️ API定義（投稿の取得・作成）
 │   │   ├── services/
-│   │   │   └── post_service.py # ⭐️ ビジネスロジック
+│   │   │   └── post_service.py # ⭐️ ビジネスロジック（処理のルール・データの検証）
 │   │   ├── db/
 │   │   │   ├── repository.py # ⭐️ データベース操作
 │   │   │   └── schema.sql   # ⭐️ テーブル定義
@@ -122,7 +122,7 @@ graph LR
 | 重要度 | ファイル | 開発時の使用頻度 | 説明 |
 |--------|----------|------------------|------|
 | 🔥 | `App.jsx`, `PostList.jsx` | 毎日 | 画面の見た目・機能を変更 |
-| 🔥 | `posts.py`, `post_service.py` | 毎日 | API・ビジネスロジックを変更 |
+| 🔥 | `posts.py`, `post_service.py` | 毎日 | API・ビジネスロジック（処理ルール）を変更 |
 | ⚡ | `usePosts.js`, `posts.js` | 週数回 | データ管理ロジックを調整 |
 | ⚡ | `repository.py`, `schema.sql` | 週数回 | データベース操作を変更 |
 | 🔧 | `package.json`, `requirements.txt` | 月数回 | 新しいライブラリを追加 |
@@ -192,7 +192,7 @@ graph LR
 | 要素 | 役割 | 身近な例 |
 |------|------|----------|
 | **フロントエンド** | ユーザーが見る画面と操作 | スマホアプリの画面、ボタン |
-| **バックエンド** | データ処理、ビジネスロジック | 「いいね」の数を計算する |
+| **バックエンド** | データ処理、ビジネスロジック（アプリのルール） | 「いいね」の数を計算する |
 | **データベース** | データの保存と管理 | 投稿内容、ユーザー情報 |
 
 ### API（エーピーアイ）とは？
@@ -432,7 +432,7 @@ server/
 │   ├── api/v1/
 │   │   └── posts.py     # ⭐️ API定義（投稿の取得・作成）
 │   ├── services/
-│   │   └── post_service.py # ⭐️ ビジネスロジック
+│   │   └── post_service.py # ⭐️ ビジネスロジック（処理のルール・データの検証）
 │   ├── db/
 │   │   ├── repository.py # ⭐️ データベース操作
 │   │   └── schema.sql   # ⭐️ テーブル定義
@@ -450,7 +450,9 @@ server/
 
 **FastAPI** = PythonでAPIを作るためのフレームワーク
 
-#### APIエンドポイントの定義
+#### APIエンドポイント（URL）の定義
+
+**エンドポイント** = APIにアクセスするためのURL（例：`/api/v1/posts`）
 ```python
 # posts.py より抜粋（簡略版）
 @router.get("/posts", response_model=List[PostResponse])
@@ -539,6 +541,10 @@ class PostCreate(BaseModel):
 
 ### 4.6 レイヤードアーキテクチャ（階層型設計）
 
+**レイヤードアーキテクチャ** = プログラムを「層」に分けて整理する設計方法
+**依存注入** = 必要な機能を外から渡す仕組み（部品の組み合わせ）
+**インターフェース** = 異なる部品をつなぐ約束事・ルール
+
 ```mermaid
 graph TB
     subgraph "クライアント層"
@@ -549,11 +555,11 @@ graph TB
         A[posts.py<br/>HTTPリクエスト/レスポンス処理]
     end
     
-    subgraph "サービス層"
-        S[post_service.py<br/>ビジネスロジック]
+    subgraph "サービス層（処理ルール層）"
+        S[post_service.py<br/>ビジネスロジック（アプリのルール）]
     end
     
-    subgraph "リポジトリ層"
+    subgraph "リポジトリ層（データ保存層）"
         R[repository.py<br/>データベース操作]
     end
     
@@ -734,8 +740,8 @@ graph TB
     
     subgraph "バックエンド"
         B[main.py<br/>エントリーポイント]
-        B1[posts.py<br/>API エンドポイント]
-        B2[post_service.py<br/>ビジネスロジック層]
+        B1[posts.py<br/>API エンドポイント（URL定義）]
+        B2[post_service.py<br/>ビジネスロジック層（処理ルール）]
         B3[repository.py<br/>データアクセス層]
         B4[config.py<br/>設定管理]
     end
@@ -782,8 +788,8 @@ sequenceDiagram
     participant U as ユーザー
     participant F as フロントエンド<br/>(React)
     participant B as バックエンド<br/>(FastAPI)
-    participant S as サービス層<br/>(post_service)
-    participant R as リポジトリ層<br/>(repository)
+    participant S as サービス層（処理ルール層）<br/>(post_service)
+    participant R as リポジトリ層（データ保存層）<br/>(repository)
     participant D as データベース<br/>(PostgreSQL)
 
     U->>F: 投稿フォームに入力
@@ -805,7 +811,7 @@ sequenceDiagram
     end
     
     rect rgba(0, 255, 0, 0.1)
-        Note over B,D: ビジネスロジック
+        Note over B,D: ビジネスロジック（処理ルール）
     end
 ```
 
@@ -821,7 +827,7 @@ flowchart TD
     Input -->|NG| FrontError[フロントエラー表示<br/>例: 文字数超過]
     
     API --> Valid{バリデーション}
-    Valid -->|OK| Service[サービス層処理]
+    Valid -->|OK| Service[サービス層（処理ルール）処理]
     Valid -->|NG| APIError[400エラー返却<br/>例: 空文字]
     
     Service --> DB{DB処理}
@@ -953,7 +959,7 @@ web-app-mvp-db-1      | LOG: statement: INSERT INTO posts (text) VALUES ($1) RET
 - [ ] `client/src/api/posts.js` - API通信の基本
 - [ ] `server/app/main.py` - サーバー起動の仕組み
 - [ ] `server/app/api/v1/posts.py` - API定義の書き方
-- [ ] `server/app/services/post_service.py` - ビジネスロジックの分離
+- [ ] `server/app/services/post_service.py` - ビジネスロジック（処理ルール）の分離
 - [ ] `server/app/db/repository.py` - データベース操作
 - [ ] `server/app/db/schema.sql` - テーブル設計
 
