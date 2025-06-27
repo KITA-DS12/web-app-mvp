@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 from typing import List
+from datetime import datetime
 from app.api.deps import get_post_service_dep
 from app.services.post_service import PostService
 
@@ -14,6 +15,7 @@ class PostCreate(BaseModel):
 class PostResponse(BaseModel):
     id: int
     text: str
+    created_at: datetime
 
 
 @router.get("/posts", response_model=List[PostResponse])
