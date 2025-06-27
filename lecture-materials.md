@@ -575,54 +575,44 @@ rows = await conn.fetch(query, user_input)
 ### 6.1 システム全体のアーキテクチャ
 
 ```mermaid
-graph LR
-    subgraph "フロントエンド (React)"
+graph TB
+    subgraph "フロントエンド"
         A[App.jsx<br/>メインコンポーネント]
         A1[PostList.jsx<br/>UI コンポーネント]
-        A2[usePosts.js<br/>カスタムフック<br/>状態管理]
+        A2[usePosts.js<br/>カスタムフック]
         A3[posts.js<br/>API 通信層]
         A4[vite.config.js<br/>開発環境設定]
     end
     
-    subgraph "バックエンド (FastAPI)"
-        B[main.py<br/>アプリケーション<br/>エントリーポイント]
+    subgraph "バックエンド"
+        B[main.py<br/>エントリーポイント]
         B1[posts.py<br/>API エンドポイント]
         B2[post_service.py<br/>ビジネスロジック層]
         B3[repository.py<br/>データアクセス層]
         B4[config.py<br/>設定管理]
     end
     
-    subgraph "データベース (PostgreSQL)"
-        C[(PostgreSQL<br/>データ永続化)]
+    subgraph "データベース"
+        C[(PostgreSQL)]
         C1[posts テーブル<br/>schema.sql]
     end
     
-    subgraph "インフラ (Docker)"
+    subgraph "インフラ"
         D[docker-compose.yml<br/>サービス連携]
-        D1[client コンテナ]
-        D2[server コンテナ]
-        D3[db コンテナ]
     end
     
-    A <-->|REST API<br/>JSON| B
-    B <-->|SQL<br/>asyncpg| C
-    
+    A <-->|REST API| B
+    B <-->|SQL| C
     A --> A1
     A1 --> A2
     A2 --> A3
-    A3 -.->|fetch()| B1
-    
     B --> B1
     B1 --> B2
     B2 --> B3
-    B3 -.->|SQL| C1
-    
-    D --> D1
-    D --> D2
-    D --> D3
-    D1 -.->|contains| A
-    D2 -.->|contains| B
-    D3 -.->|contains| C
+    C --> C1
+    D --> A
+    D --> B
+    D --> C
     
     classDef frontend fill:#3498db,stroke:#2c3e50,color:#fff
     classDef backend fill:#2ecc71,stroke:#27ae60,color:#fff
@@ -632,7 +622,7 @@ graph LR
     class A,A1,A2,A3,A4 frontend
     class B,B1,B2,B3,B4 backend
     class C,C1 database
-    class D,D1,D2,D3 infra
+    class D infra
 ```
 
 ### 6.1 データの流れを追ってみよう
