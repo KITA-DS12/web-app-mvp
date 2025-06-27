@@ -117,16 +117,16 @@ graph LR
     class H database
 ```
 
-### 📊 ファイルの重要度・開発頻度
+### 📊 ファイルの重要度
 
-| 重要度 | ファイル | 開発時の使用頻度 | 説明 |
-|--------|----------|------------------|------|
-| 🔥 | `App.jsx`, `PostList.jsx` | 毎日 | 画面の見た目・機能を変更 |
-| 🔥 | `posts.py`, `post_service.py` | 毎日 | API・ビジネスロジック（処理ルール）を変更 |
-| ⚡ | `usePosts.js`, `posts.js` | 週数回 | データ管理ロジックを調整 |
-| ⚡ | `repository.py`, `schema.sql` | 週数回 | データベース操作を変更 |
-| 🔧 | `package.json`, `requirements.txt` | 月数回 | 新しいライブラリを追加 |
-| 🔧 | `docker-compose.yml`, `Makefile` | ほぼ触らない | 環境設定（初期設定のみ） |
+| 重要度 | ファイル | 説明 |
+|--------|----------|------|
+| 🔥 | `App.jsx`, `PostList.jsx` | 画面の見た目・機能を変更 |
+| 🔥 | `posts.py`, `post_service.py` | API・ビジネスロジック（処理ルール）を変更 |
+| ⚡ | `usePosts.js`, `posts.js` | データ管理ロジックを調整 |
+| ⚡ | `repository.py`, `schema.sql` | データベース操作を変更 |
+| 🔧 | `package.json`, `requirements.txt` | 新しいライブラリを追加 |
+| 🔧 | `docker-compose.yml`, `Makefile` | 環境設定（初期設定のみ） |
 
 ### 💡 設定ファイル一覧（初学者は飛ばしてOK）
 
