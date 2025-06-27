@@ -69,12 +69,12 @@ web-app-mvp/
 **迷った時はこの順序で読んでください！**
 
 #### Phase 1: 全体の動きを理解（5分）
-1. `client/src/App.jsx` の 19〜25行目 - 画面がどう作られているか
-2. `client/src/components/PostList.jsx` の 15〜30行目 - ユーザー操作の処理
+1. `client/src/App.jsx` の 19〜30行目 - 画面がどう作られているか
+2. `client/src/components/PostList.jsx` の 15〜47行目 - ユーザー操作の処理
 
 #### Phase 2: データの流れを理解（10分）
-3. `client/src/hooks/usePosts.js` の 14〜25行目 - フロントでのデータ管理
-4. `client/src/api/posts.js` の 8〜20行目 - サーバーとの通信方法
+3. `client/src/hooks/usePosts.js` の 14〜32行目 - フロントでのデータ管理
+4. `client/src/api/posts.js` の 8〜22行目 - サーバーとの通信方法
 
 #### Phase 3: サーバー側を理解（10分）
 5. `server/app/main.py` の 30〜40行目 - サーバーがどう起動するか
@@ -82,7 +82,7 @@ web-app-mvp/
 
 #### Phase 4: データベース（5分）
 7. `server/app/db/schema.sql` の全体 - テーブル構造
-8. `server/app/db/repository.py` の 48〜56行目 - SQL実行部分
+8. `server/app/db/repository.py` の 63〜78行目 - SQL実行部分
 
 ### 🔗 ファイル間の関係図
 
@@ -158,6 +158,7 @@ graph LR
 簡単な投稿アプリを使って学びます：
 - ✅ 投稿の一覧を見る
 - ✅ 新しい投稿を追加する
+- 🚀 投稿を削除する（実習で実装）
 
 ### Web開発の3つの要素
 
@@ -202,7 +203,7 @@ graph LR
 
 ---
 
-## 🚀 2. 開発環境を動かしてみよう (15分)
+## 🚀 2. 開発環境を動かしてみよう
 
 ### 2.1 必要なツールの準備（Mac向け）
 
@@ -294,7 +295,7 @@ make dev       # 再起動
 
 ---
 
-## 🎨 3. フロントエンド（見た目）を理解しよう (35分)
+## 🎨 3. フロントエンド（見た目）を理解しよう
 
 ### 3.1 フロントエンドの構成
 
@@ -342,10 +343,10 @@ function PostList({ posts }) {
 ### 3.3 【実習1】フロントエンドを変更してみよう
 
 #### 3.3.1 タイトルを変更
-`client/src/App.jsx` を開いて、9行目のタイトル部分を変更：
+`client/src/App.jsx` を開いて、22行目のタイトル部分を変更：
 
 ```jsx
-// 変更前（9行目）
+// 変更前（22行目）
 <h1>FastAPI + React Posts App</h1>
 
 // 変更後（好きなタイトルに変更）
@@ -353,10 +354,10 @@ function PostList({ posts }) {
 ```
 
 #### 3.3.2 スタイルを追加
-同じファイル（App.jsx）の8行目のdivタグのスタイルを変更：
+同じファイル（App.jsx）の20行目のdivタグのスタイルを変更：
 
 ```jsx
-// 変更前（8行目）
+// 変更前（20行目）
 <div style={{ padding: '20px' }}>
 
 // 変更後
@@ -402,10 +403,10 @@ export const postsApi = {
 
 投稿の文字数カウンター を追加してみましょう：
 
-`client/src/components/PostList.jsx` を編集して、52行目のinput要素の直後に以下を追加：
+`client/src/components/PostList.jsx` を編集して、73行目のinput要素の直後に以下を追加：
 
 ```jsx
-// 52行目の </> の後、53行目の <button> の前に追加
+// 73行目の </> の後、75行目の <button> の前に追加
 <div style={{ 
   color: text.length > 255 ? 'red' : 'gray', 
   fontSize: '12px',
@@ -422,7 +423,7 @@ export const postsApi = {
 
 ---
 
-## ⚙️ 4. バックエンド（API）を理解しよう (35分)
+## ⚙️ 4. バックエンド（API）を理解しよう
 
 ### 4.1 バックエンドの構成
 
@@ -593,7 +594,7 @@ graph TB
 
 ---
 
-## 🗄️ 5. データベースとSQLを理解しよう (25分)
+## 🗄️ 5. データベースとSQLを理解しよう
 
 ### 5.1 データベースとは？
 
@@ -725,9 +726,433 @@ rows = await conn.fetch(query, user_input)
 
 ---
 
-## 🔄 6. 全体の仕組みを振り返ろう (20分)
+## 🚀 6. 実践演習：投稿削除機能を実装してみよう
 
-### 6.1 システム全体のアーキテクチャ
+**💡 この実習の目的**
+- バックエンドでAPI追加 → フロントエンド実装の開発フローを体験
+- 各層（API・サービス・リポジトリ・フロントエンド）の役割を理解
+- 実際の開発で行う「機能追加」の全体像を把握
+
+### 🎯 実装する機能
+投稿の一覧に「削除」ボタンを追加し、クリックすると投稿を削除できる機能
+
+### 📋 実装の流れ（開発の順序）
+
+#### Step 1: データベース層（Repository）の実装
+#### Step 2: ビジネスロジック層（Service）の実装  
+#### Step 3: API層（FastAPI）の実装
+#### Step 4: フロントエンド（API通信）の実装
+#### Step 5: フロントエンド（UI）の実装
+#### Step 6: 動作確認とテスト
+
+---
+
+### 🔧 Step 1: データベース層（Repository）の実装
+
+#### 1.1 削除機能を追加する場所を確認
+
+`server/app/db/repository.py` を開いて、`create_post` メソッドの下に削除機能を追加します。
+
+#### 1.2 削除メソッドの実装
+
+`create_post` メソッドの後（98行目付近）に以下のメソッドを追加してください：
+
+```python
+    async def delete_post(self, post_id: int) -> bool:
+        """
+        指定されたIDの投稿を削除する
+        引数: post_id - 削除する投稿のID
+        戻り値: 削除が成功した場合True、対象が見つからなかった場合False
+        """
+        if not self.pool:
+            raise RuntimeError("Database pool not initialized")
+        
+        async with self.pool.acquire() as conn:
+            # execute() : 実行された行数を返す
+            # DELETE で削除された行数が0なら対象が存在しなかった
+            result = await conn.execute(
+                "DELETE FROM posts WHERE id = $1",
+                post_id  # プレースホルダー $1 に安全に値を渡す
+            )
+            # "DELETE 1" のような文字列が返されるので、数値部分を抽出
+            return int(result.split()[-1]) > 0
+```
+
+**🎯 学習ポイント：**
+- `execute()` : データ変更系のSQLを実行し、影響を受けた行数を返す
+- プレースホルダー（`$1`）でSQLインジェクション対策
+- 戻り値で削除成功/失敗を判定
+
+---
+
+### ⚙️ Step 2: ビジネスロジック層（Service）の実装
+
+#### 2.1 削除機能を追加する場所を確認
+
+`server/app/services/post_service.py` を開いて、`create_post` メソッドの下に削除機能を追加します。
+
+#### 2.2 削除メソッドの実装
+
+`create_post` メソッドの後（73行目付近）に以下のメソッドを追加してください：
+
+```python
+    async def delete_post(self, post_id: int) -> bool:
+        """
+        指定されたIDの投稿を削除する
+        
+        ビジネスルール：
+        - 投稿IDは正の整数である必要がある
+        - 存在しない投稿IDでも例外は発生させない（False を返す）
+        
+        引数:
+            post_id: 削除する投稿のID
+            
+        戻り値: 削除が成功した場合True、失敗した場合False
+        
+        例外:
+            ValueError: 投稿IDが無効な場合
+        """
+        # ビジネスルール検証：投稿IDの妥当性チェック
+        if post_id <= 0:
+            raise ValueError("Post ID must be a positive integer")
+        
+        # リポジトリ層に処理を委譲
+        success = await post_repository.delete_post(post_id)
+        
+        # ビジネス要件：削除操作をログに記録
+        if success:
+            logger.info(f"Deleted post with id: {post_id}")
+        else:
+            logger.warning(f"Attempted to delete non-existent post with id: {post_id}")
+        
+        return success
+```
+
+**🎯 学習ポイント：**
+- ビジネスルール（投稿IDの検証）をサービス層で実装
+- ログ出力で操作の追跡が可能
+- エラーハンドリングと適切な戻り値の設定
+
+---
+
+### 🌐 Step 3: API層（FastAPI）の実装
+
+#### 3.1 削除APIエンドポイントを追加する場所を確認
+
+`server/app/api/v1/posts.py` を開いて、`create_post` 関数の後にDELETEエンドポイントを追加します。
+
+#### 3.2 削除エンドポイントの実装
+
+`create_post` 関数の後（64行目付近）に以下のエンドポイントを追加してください：
+
+```python
+# DELETE /posts/{post_id} エンドポイント：指定されたIDの投稿を削除
+@router.delete("/posts/{post_id}")
+async def delete_post(
+    # パスパラメータ：URL の {post_id} 部分が自動で引数に渡される
+    post_id: int,
+    post_service: PostService = Depends(get_post_service_dep)
+):
+    """指定されたIDの投稿を削除する API エンドポイント"""
+    try:
+        # サービス層で削除処理を実行
+        success = await post_service.delete_post(post_id)
+        
+        if success:
+            # 200 OK: 削除成功
+            return {"message": f"Post {post_id} deleted successfully"}
+        else:
+            # 404 Not Found: 削除対象が見つからない
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Post with id {post_id} not found"
+            )
+    except ValueError as e:
+        # ValueError（ビジネスロジックエラー）を HTTP 400 エラーに変換
+        raise HTTPException(status_code=400, detail=str(e))
+```
+
+**🎯 学習ポイント：**
+- パスパラメータ（`{post_id}`）の使用方法
+- HTTPステータスコードの適切な使い分け（200, 404, 400）
+- RESTful API設計の基本（DELETEメソッドの使用）
+
+---
+
+### 📡 Step 4: フロントエンド（API通信）の実装
+
+#### 4.1 API通信機能を追加する場所を確認
+
+`client/src/api/posts.js` を開いて、既存のAPI関数の下に削除機能を追加します。
+
+#### 4.2 削除API通信機能の実装
+
+`postsApi` オブジェクト内の `create` メソッドの後に以下のメソッドを追加してください：
+
+```javascript
+  // 投稿削除のAPI通信
+  async delete(postId) {
+    const response = await fetch(`/api/v1/posts/${postId}`, {
+      method: 'DELETE',  // HTTPメソッドにDELETEを指定
+    });
+    
+    // レスポンスが正常でない場合はエラーを投げる
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Failed to delete post');
+    }
+    
+    // 削除成功時はレスポンスボディを返す（通常は確認メッセージ）
+    return response.json();
+  }
+```
+
+**🎯 学習ポイント：**
+- DELETEメソッドでのHTTPリクエスト
+- URLにパラメータを含める方法（`${postId}`）
+- エラーハンドリングとレスポンス処理
+
+---
+
+### 🎨 Step 5: フロントエンド（UI）の実装
+
+#### 5.1 削除機能をフックに追加
+
+`client/src/hooks/usePosts.js` を開いて、削除機能を追加します。
+
+##### 5.1.1 削除関数の実装
+
+`createPost` 関数の後に以下の関数を追加してください：
+
+```javascript
+  // 投稿削除処理
+  const deletePost = async (postId) => {
+    try {
+      // API呼び出しで投稿を削除
+      await postsApi.delete(postId);
+      
+      // 成功時：削除された投稿を状態から除去
+      setPosts(currentPosts => 
+        currentPosts.filter(post => post.id !== postId)
+      );
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Delete post error:', error);
+      return { 
+        success: false, 
+        error: error.message 
+      };
+    }
+  };
+```
+
+##### 5.1.2 削除関数をエクスポート
+
+return文で `deletePost` も返すように変更してください：
+
+```javascript
+  return {
+    posts,
+    loading,
+    error,
+    createPost,
+    deletePost,  // この行を追加
+    refetch: fetchPosts
+  };
+```
+
+#### 5.2 UIに削除ボタンを追加
+
+`client/src/components/PostList.jsx` を開いて、投稿一覧に削除ボタンを追加します。
+
+##### 5.2.1 削除処理の状態管理を追加
+
+`useState` の部分（9〜11行目付近）に削除中の状態を追加：
+
+```javascript
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
+  const [deletingIds, setDeletingIds] = useState(new Set()); // 削除中の投稿IDを管理
+```
+
+##### 5.2.2 削除処理関数を追加
+
+`handleSubmit` 関数の後に削除処理関数を追加：
+
+```javascript
+  // 投稿削除処理
+  const handleDelete = async (postId) => {
+    // 確認ダイアログを表示
+    if (!window.confirm('この投稿を削除しますか？')) {
+      return;
+    }
+    
+    // 削除中の状態を設定
+    setDeletingIds(prev => new Set(prev).add(postId));
+    
+    // 削除API呼び出し
+    const result = await onDeletePost(postId);
+    
+    // 削除中の状態を解除
+    setDeletingIds(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(postId);
+      return newSet;
+    });
+    
+    // 削除失敗時はアラートを表示
+    if (!result.success) {
+      alert(`削除に失敗しました: ${result.error}`);
+    }
+  };
+```
+
+##### 5.2.3 propsに削除関数を追加
+
+関数の引数（6行目）に `onDeletePost` を追加：
+
+```javascript
+export function PostList({ posts, loading, error, onCreatePost, onDeletePost }) {
+```
+
+##### 5.2.4 投稿一覧に削除ボタンを追加
+
+投稿一覧の表示部分（98行目付近）を以下のように変更：
+
+```javascript
+            {posts.map(post => (
+              <li key={post.id} style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                padding: '8px 0',
+                borderBottom: '1px solid #eee'
+              }}>
+                <span>{post.text} (ID: {post.id})</span>
+                <button
+                  onClick={() => handleDelete(post.id)}
+                  disabled={deletingIds.has(post.id)}
+                  style={{
+                    backgroundColor: '#ff4444',
+                    color: 'white',
+                    border: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  {deletingIds.has(post.id) ? '削除中...' : '削除'}
+                </button>
+              </li>
+            ))}
+```
+
+#### 5.3 App.jsxで削除機能を接続
+
+`client/src/App.jsx` を開いて、削除機能を接続します。
+
+`PostList` コンポーネントの呼び出し部分に `onDeletePost` を追加：
+
+```javascript
+      <PostList 
+        posts={posts} 
+        loading={loading} 
+        error={error} 
+        onCreatePost={createPost}
+        onDeletePost={deletePost}  // この行を追加
+      />
+```
+
+**🎯 学習ポイント：**
+- 状態管理（削除中の投稿IDを追跡）
+- ユーザビリティ（確認ダイアログ、ローディング状態）
+- React の props でのデータ・関数の受け渡し
+
+---
+
+### ✅ Step 6: 動作確認とテスト
+
+#### 6.1 サーバーの再起動
+
+変更を反映させるため、開発サーバーを再起動します：
+
+```bash
+# 開発環境を停止
+make dev-down
+
+# 開発環境を再起動
+make dev
+```
+
+#### 6.2 基本動作の確認
+
+1. **フロントエンド画面の確認**
+   - http://localhost:5173 にアクセス
+   - 投稿一覧に「削除」ボタンが表示されることを確認
+
+2. **削除機能のテスト**
+   - 既存の投稿の「削除」ボタンをクリック
+   - 確認ダイアログが表示されることを確認
+   - 「OK」を選択して投稿が削除されることを確認
+
+3. **API仕様書での確認**
+   - http://localhost:8000/docs にアクセス
+   - `DELETE /api/v1/posts/{post_id}` エンドポイントが追加されていることを確認
+
+#### 6.3 API直接テスト
+
+Swagger UIを使って削除APIを直接テストしてみましょう：
+
+1. `DELETE /api/v1/posts/{post_id}` をクリック
+2. 「Try it out」をクリック
+3. `post_id` に削除したい投稿のIDを入力
+4. 「Execute」をクリック
+5. レスポンスを確認
+
+#### 6.4 エラーケースのテスト
+
+以下のケースでも正しく動作することを確認：
+
+1. **存在しない投稿ID**
+   - 999など存在しないIDで削除を試行
+   - 404エラーが返されることを確認
+
+2. **不正な投稿ID**
+   - 負の数（-1など）で削除を試行
+   - 400エラーが返されることを確認
+
+3. **削除の取り消し**
+   - 削除ボタンをクリックしてから「キャンセル」を選択
+   - 投稿が削除されないことを確認
+
+---
+
+### 🌟 実習で学んだこと
+
+#### 🏗️ 開発フローの理解
+1. **データベース層** → **ビジネスロジック層** → **API層** → **フロントエンド通信** → **UI実装**
+2. 各層での役割分担と責任の分離
+3. エラーハンドリングの各層での実装方法
+
+#### 🔧 技術的な学習ポイント
+- **SQL**: DELETE文とトランザクション
+- **FastAPI**: パスパラメータとHTTPステータスコード
+- **React**: 状態管理と条件付きレンダリング
+- **JavaScript**: 非同期処理とエラーハンドリング
+
+#### 💡 実践的なスキル
+- **レイヤードアーキテクチャ**の実装
+- **RESTful API**の設計
+- **ユーザビリティ**を考慮したUI設計
+- **防御的プログラミング**（入力検証、エラー処理）
+
+---
+
+## 🔄 7. 全体の仕組みを振り返ろう
+
+### 7.1 システム全体のアーキテクチャ
 
 ```mermaid
 graph TB
@@ -780,7 +1205,7 @@ graph TB
     class D infra
 ```
 
-### 6.1 データの流れを追ってみよう
+### 7.2 データの流れを追ってみよう
 
 新しい投稿を作成する場合の流れ：
 
@@ -816,9 +1241,9 @@ sequenceDiagram
     end
 ```
 
-### 6.2 【実習7】エラーハンドリングを確認しよう
+### 7.3 【実習】エラーハンドリングを確認しよう
 
-#### 6.2.1 バリデーションエラー
+#### 7.3.1 バリデーションエラー
 
 ```mermaid
 flowchart TD
@@ -865,7 +1290,7 @@ flowchart TD
    - 文字数カウンターが255文字を超えて赤色に変わる
    - 「テキストは255文字以内で入力してください」エラーが表示される
 
-#### 6.2.2 ネットワークエラー
+#### 7.3.2 ネットワークエラー
 1. **データベース停止による影響確認**
    ```bash
    # データベースコンテナ名を確認
@@ -887,7 +1312,7 @@ flowchart TD
 - 各層でのエラー処理の重要性
 - ユーザーへの適切なフィードバック
 
-### 6.3 【実習8】ログを見てみよう
+### 7.4 【実習】ログを見てみよう
 
 ターミナルでdocker-composeを実行している画面を見てみましょう：
 
@@ -901,7 +1326,7 @@ web-app-mvp-db-1      | LOG: statement: INSERT INTO posts (text) VALUES ($1) RET
 - アプリケーションの動作がログで確認できる
 - デバッグやトラブルシューティングに重要
 
-### 6.4 開発でよく使うツール
+### 7.5 開発でよく使うツール
 
 | ツール | 用途 | 今回の例 |
 |--------|------|----------|
@@ -911,7 +1336,7 @@ web-app-mvp-db-1      | LOG: statement: INSERT INTO posts (text) VALUES ($1) RET
 | **テスト** | 品質保証 | pytest |
 | **ログ** | 動作確認 | アプリケーションログ |
 
-### 6.5 今日学んだことのまとめ
+### 7.6 今日学んだことのまとめ
 
 #### 技術要素
 - ✅ **フロントエンド**: React, JavaScript, HTML/CSS
@@ -932,6 +1357,7 @@ web-app-mvp-db-1      | LOG: statement: INSERT INTO posts (text) VALUES ($1) RET
 - ✅ APIを直接操作した
 - ✅ SQLでデータベースを操作した
 - ✅ ログやエラーメッセージを読んだ
+- 🚀 **バックエンドAPI実装 → フロントエンド実装の開発フローを体験した**
 
 
 ## 🎯 最後に
@@ -979,12 +1405,12 @@ web-app-mvp-db-1      | LOG: statement: INSERT INTO posts (text) VALUES ($1) RET
 理解度チェックが完了したら、以下の機能追加に挑戦してみてください：
 
 ### 🔰 初級課題（重要ファイルの変更を練習）
-1. **投稿の削除機能**を追加
+1. **投稿の編集機能**を追加  
    - 変更ファイル：`PostList.jsx`, `posts.py`, `post_service.py`, `repository.py`
-2. **投稿の編集機能**を追加  
-   - 変更ファイル：`PostList.jsx`, `posts.py`, `post_service.py`, `repository.py`
-3. **文字数制限の変更**（255文字 → 500文字）
+2. **文字数制限の変更**（255文字 → 500文字）
    - 変更ファイル：`PostList.jsx`, `posts.py`, `schema.sql`
+3. **投稿の作成日時表示**を追加
+   - 変更ファイル：`PostList.jsx`
 
 ### 🔥 中級課題（新機能の追加を練習）
 1. **投稿の検索機能**を追加（LIKE演算子を使用）
