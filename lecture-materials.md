@@ -6,12 +6,146 @@
 
 ## 📚 講座の流れ
 
-1. **Web開発の全体像を知ろう**
-2. **開発環境を動かしてみよう**
-3. **フロントエンド（見た目）を理解しよう**
-4. **バックエンド（API）を理解しよう**
-5. **データベースとSQLを理解しよう**
-6. **全体の仕組みを振り返ろう**
+**⚠️ 初学者の方へ：まず「0.5 このプロジェクトのファイルマップ」を読んでから始めてください！**
+
+1. **📁 このプロジェクトのファイルマップ**　← まずはここから！
+2. **🌟 Web開発の全体像を知ろう**
+3. **🚀 開発環境を動かしてみよう**
+4. **🎨 フロントエンド（見た目）を理解しよう**
+5. **⚙️ バックエンド（API）を理解しよう**
+6. **🗄️ データベースとSQLを理解しよう**
+7. **🔄 全体の仕組みを振り返ろう**
+---
+
+## 🗂️ 0.5 このプロジェクトのファイルマップ
+
+### 📁 全体構造
+
+まず最初に、このプロジェクトにはどんなファイルがあるのかを確認しましょう。
+
+```
+web-app-mvp/
+├── 📁 client/              # フロントエンド（画面・UI）
+│   ├── src/
+│   │   ├── App.jsx         # ⭐️ メイン画面（最初に見るファイル）
+│   │   ├── components/
+│   │   │   └── PostList.jsx # ⭐️ 投稿一覧・投稿フォーム
+│   │   ├── hooks/
+│   │   │   └── usePosts.js  # ⭐️ データ管理ロジック
+│   │   └── api/
+│   │       └── posts.js     # ⭐️ サーバーとの通信
+│   ├── package.json        # 🔧 使用ライブラリ一覧
+│   └── vite.config.js      # 🔧 開発環境設定
+├── 📁 server/              # バックエンド（処理・API）
+│   ├── app/
+│   │   ├── main.py         # ⭐️ サーバー起動ファイル（最初に見る）
+│   │   ├── api/v1/
+│   │   │   └── posts.py    # ⭐️ API定義（投稿の取得・作成）
+│   │   ├── services/
+│   │   │   └── post_service.py # ⭐️ ビジネスロジック
+│   │   ├── db/
+│   │   │   ├── repository.py # ⭐️ データベース操作
+│   │   │   └── schema.sql   # ⭐️ テーブル定義
+│   │   └── core/
+│   │       ├── config.py   # 🔧 設定管理
+│   │       └── logging.py  # 🔧 ログ設定
+│   ├── requirements.txt    # 🔧 使用ライブラリ一覧
+│   └── tests/
+│       └── test_posts.py   # 🧪 テストコード
+├── 📁 infra/              # インフラ（環境構築）
+│   └── docker-compose.yml # 🔧 開発環境設定
+├── Makefile               # 🔧 よく使うコマンド集
+└── lecture-materials.md   # 📖 この資料
+```
+
+**記号の意味：**
+- ⭐️ = **最重要ファイル**（必ず理解すべき）
+- 🔧 = **設定ファイル**（最初は理解しなくてOK）
+- 🧪 = **テストファイル**（余裕があれば見る）
+- 📖 = **ドキュメント**
+
+### 🎯 初学者向け：最初に読むべきファイルの順序
+
+**迷った時はこの順序で読んでください！**
+
+#### Phase 1: 全体の動きを理解（5分）
+1. `client/src/App.jsx` の 19〜25行目 - 画面がどう作られているか
+2. `client/src/components/PostList.jsx` の 15〜30行目 - ユーザー操作の処理
+
+#### Phase 2: データの流れを理解（10分）
+3. `client/src/hooks/usePosts.js` の 14〜25行目 - フロントでのデータ管理
+4. `client/src/api/posts.js` の 8〜20行目 - サーバーとの通信方法
+
+#### Phase 3: サーバー側を理解（10分）
+5. `server/app/main.py` の 30〜40行目 - サーバーがどう起動するか
+6. `server/app/api/v1/posts.py` の 32〜45行目 - APIがどう定義されるか
+
+#### Phase 4: データベース（5分）
+7. `server/app/db/schema.sql` の全体 - テーブル構造
+8. `server/app/db/repository.py` の 48〜56行目 - SQL実行部分
+
+### 🔗 ファイル間の関係図
+
+#### フロントエンド内の関係
+```mermaid
+graph TD
+    A[App.jsx<br/>メイン画面] --> B[PostList.jsx<br/>投稿一覧・フォーム]
+    A --> C[usePosts.js<br/>データ管理]
+    C --> D[posts.js<br/>API通信]
+    
+    classDef main fill:#e1f5fe,stroke:#01579b,color:#000
+    classDef component fill:#f3e5f5,stroke:#4a148c,color:#000
+    classDef logic fill:#e8f5e8,stroke:#2e7d32,color:#000
+    
+    class A main
+    class B component
+    class C,D logic
+```
+
+#### システム全体の関係
+```mermaid
+graph LR
+    F[React<br/>フロントエンド] <-->|HTTP API| G[FastAPI<br/>バックエンド]
+    G <-->|SQL| H[PostgreSQL<br/>データベース]
+    
+    classDef frontend fill:#4A90E2,stroke:#357ABD,color:#FFFFFF
+    classDef backend fill:#50C878,stroke:#3B9C5F,color:#FFFFFF
+    classDef database fill:#FF6B6B,stroke:#CC5555,color:#FFFFFF
+    
+    class F frontend
+    class G backend
+    class H database
+```
+
+### 📊 ファイルの重要度・開発頻度
+
+| 重要度 | ファイル | 開発時の使用頻度 | 説明 |
+|--------|----------|------------------|------|
+| 🔥 | `App.jsx`, `PostList.jsx` | 毎日 | 画面の見た目・機能を変更 |
+| 🔥 | `posts.py`, `post_service.py` | 毎日 | API・ビジネスロジックを変更 |
+| ⚡ | `usePosts.js`, `posts.js` | 週数回 | データ管理ロジックを調整 |
+| ⚡ | `repository.py`, `schema.sql` | 週数回 | データベース操作を変更 |
+| 🔧 | `package.json`, `requirements.txt` | 月数回 | 新しいライブラリを追加 |
+| 🔧 | `docker-compose.yml`, `Makefile` | ほぼ触らない | 環境設定（初期設定のみ） |
+
+### 💡 設定ファイル一覧（初学者は飛ばしてOK）
+
+**これらのファイルは最初は理解しなくて大丈夫です：**
+
+| ファイル | 役割 | いつ触る？ |
+|----------|------|------------|
+| `package.json` | フロントエンドで使うライブラリ一覧 | 新しいライブラリ追加時のみ |
+| `requirements.txt` | バックエンドで使うライブラリ一覧 | 新しいライブラリ追加時のみ |
+| `vite.config.js` | フロントエンドの開発サーバー設定 | 通常は触らない |
+| `docker-compose.yml` | 開発環境の設定（DB、サーバー、フロント） | 通常は触らない |
+| `Makefile` | よく使うコマンドの短縮形 | `make dev`で起動時のみ |
+| `config.py`, `logging.py` | サーバーの細かい設定 | 通常は触らない |
+
+**初学者へのアドバイス：**
+- 最初は⭐️マークのファイルだけに集中しましょう
+- 設定ファイル（🔧）は「あるんだな」程度の認識でOK
+- 分からないファイルがあっても気にしないで進めましょう！
+
 ---
 
 ## 🌟 1. Web開発の全体像を知ろう
@@ -167,15 +301,19 @@ make dev       # 再起動
 ```
 client/
 ├── src/
-│   ├── App.jsx          # メイン画面
+│   ├── App.jsx          # ⭐️ メイン画面（まずここから読む）
 │   ├── components/
-│   │   └── PostList.jsx # 投稿一覧コンポーネント
+│   │   └── PostList.jsx # ⭐️ 投稿一覧・投稿フォーム
 │   ├── hooks/
-│   │   └── usePosts.js  # データ管理
+│   │   └── usePosts.js  # ⭐️ データ管理ロジック
 │   └── api/
-│       └── posts.js     # API通信
-└── package.json         # 使用ライブラリ一覧
+│       └── posts.js     # ⭐️ サーバーとの通信
+└── package.json         # 🔧 使用ライブラリ一覧（設定ファイル）
 ```
+
+**💡 ヒント：**
+- ⭐️マークのファイルから順番に読みましょう
+- 🔧マークの設定ファイルは後回しでOK
 
 ### 3.2 React の基本概念
 
@@ -290,13 +428,23 @@ export const postsApi = {
 ```
 server/
 ├── app/
-│   ├── main.py          # アプリのエントリーポイント
-│   ├── api/v1/posts.py  # 投稿API
-│   ├── services/        # ビジネスロジック
-│   ├── db/              # データベース関連
-│   └── core/            # 設定ファイル
-└── tests/               # テストコード
+│   ├── main.py          # ⭐️ サーバー起動ファイル（まずここから読む）
+│   ├── api/v1/
+│   │   └── posts.py     # ⭐️ API定義（投稿の取得・作成）
+│   ├── services/
+│   │   └── post_service.py # ⭐️ ビジネスロジック
+│   ├── db/
+│   │   ├── repository.py # ⭐️ データベース操作
+│   │   └── schema.sql   # ⭐️ テーブル定義
+│   └── core/            # 🔧 設定ファイル（config.py, logging.py）
+├── tests/               # 🧪 テストコード
+└── requirements.txt     # 🔧 使用ライブラリ一覧（設定ファイル）
 ```
+
+**💡 ヒント：**
+- ⭐️マークのファイルから順番に読みましょう
+- 🔧マークの設定ファイルは後回しでOK
+- 🧪テストは余裕があれば見る
 
 ### 4.2 FastAPI の基本
 
@@ -794,23 +942,56 @@ web-app-mvp-db-1      | LOG: statement: INSERT INTO posts (text) VALUES ($1) RET
 
 ---
 
+## 📁 理解度チェック：重要ファイルを再確認
+
+講座を終えたら、以下のファイルを改めて見直してみましょう：
+
+### ✅ 必ず理解すべきファイル（⭐️）
+- [ ] `client/src/App.jsx` - React コンポーネントの基本
+- [ ] `client/src/components/PostList.jsx` - UIコンポーネントの作り方
+- [ ] `client/src/hooks/usePosts.js` - データ管理の仕組み
+- [ ] `client/src/api/posts.js` - API通信の基本
+- [ ] `server/app/main.py` - サーバー起動の仕組み
+- [ ] `server/app/api/v1/posts.py` - API定義の書き方
+- [ ] `server/app/services/post_service.py` - ビジネスロジックの分離
+- [ ] `server/app/db/repository.py` - データベース操作
+- [ ] `server/app/db/schema.sql` - テーブル設計
+
+### 💡 余裕があれば理解したいファイル（🔧）
+- [ ] `client/vite.config.js` - フロントエンド開発環境設定
+- [ ] `infra/docker-compose.yml` - 開発環境の構築
+- [ ] `Makefile` - よく使うコマンドの自動化
+
+**🎯 学習のゴール：**
+上記のファイルを見て「このファイルは何をしているか」が説明できるようになること！
+
+---
+
 ## 📝 課題（持ち帰り）
 
-余裕がある人は、以下の機能追加に挑戦してみてください：
+理解度チェックが完了したら、以下の機能追加に挑戦してみてください：
 
-### 🔰 初級課題
+### 🔰 初級課題（重要ファイルの変更を練習）
 1. **投稿の削除機能**を追加
+   - 変更ファイル：`PostList.jsx`, `posts.py`, `post_service.py`, `repository.py`
 2. **投稿の編集機能**を追加  
+   - 変更ファイル：`PostList.jsx`, `posts.py`, `post_service.py`, `repository.py`
 3. **文字数制限の変更**（255文字 → 500文字）
+   - 変更ファイル：`PostList.jsx`, `posts.py`, `schema.sql`
 
-### 🔥 中級課題
+### 🔥 中級課題（新機能の追加を練習）
 1. **投稿の検索機能**を追加（LIKE演算子を使用）
 2. **投稿者名**フィールドを追加（DBスキーマ変更含む）
 3. **投稿のソート機能**（日付順、文字数順など）
 
-### 🚀 上級課題
+### 🚀 上級課題（アーキテクチャの拡張）
 1. **ページング機能**（大量データ対応）
 2. **リアルタイム更新**（WebSocket使用）
 3. **ユーザー認証機能**の追加
+
+**💡 課題のヒント：**
+- 各課題で「どのファイルを変更する必要があるか」を考えてから実装
+- 困った時は「0.5 ファイルマップ」に戻って構造を確認
+- 一つずつ小さく実装して動作確認することが大切
 
 頑張って挑戦してみてください！🎉
