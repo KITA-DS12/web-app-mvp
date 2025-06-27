@@ -30,14 +30,30 @@
 
 ### Web開発の3つの要素
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   フロントエンド      │◄──►│    バックエンド       │◄──►│   データベース        │
-│  (見た目・操作)      │    │   (処理・制御)      │    │   (データ保存)      │
-│                 │    │                 │    │                 │
-│ HTML/CSS/JS     │    │ Python/FastAPI  │    │ PostgreSQL      │
-│ React/Vite      │    │                 │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+```mermaid
+graph LR
+    subgraph "フロントエンド"
+        A[見た目・操作<br/>HTML/CSS/JS<br/>React/Vite]
+    end
+    
+    subgraph "バックエンド"
+        B[処理・制御<br/>Python/FastAPI]
+    end
+    
+    subgraph "データベース"
+        C[データ保存<br/>PostgreSQL]
+    end
+    
+    A <-->|API| B
+    B <-->|SQL| C
+    
+    classDef frontend fill:#4A90E2,stroke:#357ABD,color:#FFFFFF
+    classDef backend fill:#50C878,stroke:#3B9C5F,color:#FFFFFF
+    classDef database fill:#FF6B6B,stroke:#CC5555,color:#FFFFFF
+    
+    class A frontend
+    class B backend
+    class C database
 ```
 
 ### それぞれの役割
@@ -339,14 +355,44 @@ class PostCreate(BaseModel):
 
 ### 4.6 レイヤードアーキテクチャ（階層型設計）
 
-```
-API層 (posts.py)
-     ↓
-サービス層 (post_service.py)  ← ビジネスロジック
-     ↓
-リポジトリ層 (repository.py)  ← データベース操作
-     ↓
-データベース (PostgreSQL)
+```mermaid
+graph TB
+    subgraph "クライアント層"
+        C[ブラウザ/アプリ]
+    end
+    
+    subgraph "API層"
+        A[posts.py<br/>HTTPリクエスト/レスポンス処理]
+    end
+    
+    subgraph "サービス層"
+        S[post_service.py<br/>ビジネスロジック]
+    end
+    
+    subgraph "リポジトリ層"
+        R[repository.py<br/>データベース操作]
+    end
+    
+    subgraph "データ層"
+        D[(PostgreSQL<br/>データ永続化)]
+    end
+    
+    C -.->|HTTP| A
+    A -->|依存注入| S
+    S -->|インターフェース| R
+    R -->|SQL| D
+    
+    classDef client fill:#3498db,stroke:#2c3e50,color:#fff
+    classDef api fill:#e74c3c,stroke:#c0392b,color:#fff
+    classDef service fill:#2ecc71,stroke:#27ae60,color:#fff
+    classDef repo fill:#f39c12,stroke:#d68910,color:#fff
+    classDef db fill:#9b59b6,stroke:#8e44ad,color:#fff
+    
+    class C client
+    class A api
+    class S service
+    class R repo
+    class D db
 ```
 
 **なぜ分けるの？**
@@ -490,53 +536,152 @@ rows = await conn.fetch(query, user_input)
 
 ## 🔄 6. 全体の仕組みを振り返ろう (20分)
 
+```mermaid
+graph LR
+    subgraph "フロントエンド"
+        A[React + Vite<br/>UI/UX]
+        A1[PostList.jsx<br/>コンポーネント]
+        A2[usePosts.js<br/>状態管理]
+        A3[posts.js<br/>API通信]
+    end
+    
+    subgraph "バックエンド"
+        B[FastAPI<br/>APIサーバー]
+        B1[posts.py<br/>エンドポイント]
+        B2[post_service.py<br/>ビジネスロジック]
+        B3[repository.py<br/>DB操作]
+    end
+    
+    subgraph "データベース"
+        C[(PostgreSQL<br/>データ永続化)]
+        C1[posts テーブル]
+    end
+    
+    A <-->|REST API<br/>JSON| B
+    B <-->|SQL<br/>asyncpg| C
+    
+    A --> A1
+    A1 --> A2
+    A2 --> A3
+    A3 -.->|fetch()| B1
+    
+    B --> B1
+    B1 --> B2
+    B2 --> B3
+    B3 -.->|SQL| C1
+    
+    classDef frontend fill:#3498db,stroke:#2c3e50,color:#fff
+    classDef backend fill:#2ecc71,stroke:#27ae60,color:#fff
+    classDef database fill:#e74c3c,stroke:#c0392b,color:#fff
+    classDef submodule fill:#34495e,stroke:#2c3e50,color:#ecf0f1
+    
+    class A,A1,A2,A3 frontend
+    class B,B1,B2,B3 backend
+    class C,C1 database
+```
+
 ### 6.1 データの流れを追ってみよう
 
 新しい投稿を作成する場合の流れ：
 
-```
-1. 【フロントエンド】
-   ユーザーが投稿フォームに入力
-        ↓
-   fetch()でPOSTリクエスト送信
-        ↓
+```mermaid
+sequenceDiagram
+    participant U as ユーザー
+    participant F as フロントエンド<br/>(React)
+    participant B as バックエンド<br/>(FastAPI)
+    participant S as サービス層<br/>(post_service)
+    participant R as リポジトリ層<br/>(repository)
+    participant D as データベース<br/>(PostgreSQL)
 
-2. 【バックエンド】
-   FastAPIがリクエストを受信
-        ↓
-   バリデーション（入力チェック）
-        ↓
-   post_service.create_post()呼び出し
-        ↓
-   post_repository.create_post()呼び出し
-        ↓
-
-3. 【データベース】
-   INSERT文でデータを保存
-        ↓
-   保存されたデータを返却
-        ↓
-
-4. 【バックエンド】
-   JSONレスポンスを送信
-        ↓
-
-5. 【フロントエンド】  
-   新しい投稿を画面に表示
+    U->>F: 投稿フォームに入力
+    F->>F: バリデーション<br/>（文字数チェック）
+    F->>B: POST /api/v1/posts<br/>{"text": "..."}
+    B->>B: バリデーション<br/>（Pydantic）
+    B->>S: create_post(text)
+    S->>R: create_post(text)
+    R->>D: INSERT INTO posts...
+    D-->>R: 保存データ返却
+    R-->>S: Postオブジェクト
+    S-->>B: PostResponse
+    B-->>F: JSONレスポンス<br/>{"id": 1, "text": "..."}
+    F->>F: 画面更新
+    F-->>U: 新投稿を表示
+    
+    rect rgba(255, 0, 0, 0.1)
+        Note over F,B: API通信
+    end
+    
+    rect rgba(0, 255, 0, 0.1)
+        Note over B,D: ビジネスロジック
+    end
 ```
 
 ### 6.2 【実習7】エラーハンドリングを確認しよう
 
 #### 6.2.1 バリデーションエラー
-1. フロントエンドで空文字を投稿してみる
-2. 256文字以上を投稿してみる
-3. どのようなエラーメッセージが表示されるか確認
+
+```mermaid
+flowchart TD
+    Start[ユーザー操作] --> Input{入力チェック}
+    
+    Input -->|OK| API[APIリクエスト送信]
+    Input -->|NG| FrontError[フロントエラー表示<br/>例: 文字数超過]
+    
+    API --> Valid{バリデーション}
+    Valid -->|OK| Service[サービス層処理]
+    Valid -->|NG| APIError[400エラー返却<br/>例: 空文字]
+    
+    Service --> DB{DB処理}
+    DB -->|成功| Success[正常レスポンス]
+    DB -->|失敗| DBError[500エラー返却<br/>例: DB接続失敗]
+    
+    Success --> Update[画面更新]
+    FrontError --> End[終了]
+    APIError --> ErrorDisplay[エラー表示]
+    DBError --> ErrorDisplay
+    ErrorDisplay --> End
+    Update --> End
+    
+    classDef error fill:#e74c3c,stroke:#c0392b,color:#fff
+    classDef success fill:#2ecc71,stroke:#27ae60,color:#fff
+    classDef process fill:#3498db,stroke:#2980b9,color:#fff
+    
+    class FrontError,APIError,DBError,ErrorDisplay error
+    class Success,Update success
+    class API,Service,DB process
+```
+
+**実際に試してみよう：**
+
+1. **空文字での投稿**
+   - 投稿フォームに何も入力せずに「投稿」ボタンを押す
+   - 「テキストを入力してください」エラーが表示される
+
+2. **256文字以上での投稿**
+   - 以下の長いテキストをコピー&ペーストして投稿
+   ```
+   ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ
+   ```
+   - 文字数カウンターが255文字を超えて赤色に変わる
+   - 「テキストは255文字以内で入力してください」エラーが表示される
 
 #### 6.2.2 ネットワークエラー
-1. データベースを停止: `docker-compose -f infra/docker-compose.yml stop db`
-2. 投稿を作成しようとする
-3. エラーの挙動を確認
-4. データベースを再開: `docker-compose -f infra/docker-compose.yml start db`
+1. **データベース停止による影響確認**
+   ```bash
+   # データベースコンテナ名を確認
+   docker ps --filter name=db
+   
+   # データベースを停止
+   docker-compose -f infra/docker-compose.yml stop db
+   ```
+2. フロントエンドで投稿を試行
+3. エラーメッセージを確認
+4. **データベースを再開**
+   ```bash
+   docker-compose -f infra/docker-compose.yml start db
+   ```
+   
+**⚠️ 注意**: 必ずデータベースを再開してください。停止したままだと以降の実習ができません。
 
 **🎯 学習ポイント：**
 - 各層でのエラー処理の重要性
