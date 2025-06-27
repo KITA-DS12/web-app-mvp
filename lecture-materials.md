@@ -70,7 +70,46 @@ graph LR
 
 ## 🚀 2. 開発環境を動かしてみよう (15分)
 
-### 2.1 必要なツールの確認
+### 2.1 必要なツールの準備（Mac向け）
+
+#### 2.1.1 Homebrewのインストール（未インストールの場合）
+
+```bash
+# Homebrewがインストール済みか確認
+brew --version
+
+# インストールされていない場合、以下を実行
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+#### 2.1.2 必要なツールのインストール
+
+```bash
+# Docker Desktop のインストール
+brew install --cask docker
+
+# makeは通常macOSに標準搭載されていますが、念のため確認
+make --version
+
+# makeがない場合（稀）
+xcode-select --install
+```
+
+#### 2.1.3 Dockerの起動と確認
+
+```bash
+# Docker Desktop アプリを起動（Applications フォルダから、または）
+open -a Docker
+
+# Dockerが動作していることを確認
+docker --version
+docker-compose --version
+docker ps
+```
+
+⚠️ **注意**: Docker Desktop の初回起動時は管理者権限が必要です。パスワード入力を求められた場合は入力してください。
+
+### 2.2 必要なツールの概要
 
 今回使用するツール：
 - **Docker**: アプリを簡単に動かすためのツール
